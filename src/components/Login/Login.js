@@ -8,6 +8,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
+  sendEmailVerification,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import firebaseConfig from "./firebase.config";
 import { useContext, useState } from "react";
@@ -98,6 +100,7 @@ function Login() {
           newUserInfo.success = true;
           setUser(newUserInfo);
           updateUserName(user.name);
+          verifyEmail();
         })
         .catch((error) => {
           const newUserInfo = { ...user };
@@ -132,6 +135,27 @@ function Login() {
     })
       .then(() => {})
       .catch((error) => {});
+  };
+
+  const verifyEmail = () => {
+    const auth = getAuth();
+    sendEmailVerification(auth.currentUser).then(() => {
+      // Email verification sent!
+      // ...
+    });
+  };
+  const resetPassword = (email) => {
+    const auth = getAuth();
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        // Password reset email sent!
+        // ..
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // ..
+      });
   };
 
   return (
@@ -187,6 +211,7 @@ function Login() {
         <br />
         <input type="submit" value={newUser ? "Sign Up" : "Sign In"} />
       </form>
+      <button onClick={() => resetPassword(user.email)}>Forget Password</button>
       <p style={{ color: "red" }}>{user.error}</p>
       {user.success && (
         <p style={{ color: "green" }}>
